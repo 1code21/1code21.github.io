@@ -9,6 +9,7 @@
     medium: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 12a6.8 6.8 0 1 1-13.5 0 6.8 6.8 0 0 1 13.5 0zm7.4 0c0 3.5-1.5 6.4-3.4 6.4s-3.4-2.9-3.4-6.4 1.5-6.4 3.4-6.4 3.4 2.9 3.4 6.4zM24 12c0 3.2-.5 5.7-1.2 5.7s-1.2-2.5-1.2-5.7.5-5.7 1.2-5.7S24 8.8 24 12z"/></svg>',
     phone: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg>',
     mail: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>',
+    download: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>',
     file: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/></svg>',
     star: '<svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" style="vertical-align:-1px"><path d="m12 2 3 6.9 7.5.7-5.7 5 1.7 7.4L12 18l-6.5 4 1.7-7.4-5.7-5 7.5-.7z"/></svg>',
   };
@@ -16,11 +17,11 @@
   const linkButtons = (primaryFirst) => {
     const L = S.links || {};
     const out = [];
-    if (S.resume) out.push(`<a class="btn primary" href="${esc(S.resume)}" target="_blank" rel="noopener">${ICONS.file}Résumé</a>`);
+    if (S.resume && primaryFirst) out.push(`<a class="btn primary" href="${esc(S.resume)}" download>${ICONS.download}Download résumé</a>`, `<a class="btn" href="${esc(S.resume)}" target="_blank" rel="noopener">${ICONS.file}View PDF</a>`);
+    if (S.resume && !primaryFirst) out.push(`<a class="btn primary" href="${esc(S.resume)}" download>${ICONS.download}Résumé (PDF)</a>`);
     if (L.github) out.push(`<a class="btn" href="${esc(L.github)}" target="_blank" rel="noopener">${ICONS.github}GitHub</a>`);
     if (L.linkedin) out.push(`<a class="btn" href="${esc(L.linkedin)}" target="_blank" rel="noopener">${ICONS.linkedin}LinkedIn</a>`);
     if (L.medium) out.push(`<a class="btn" href="${esc(L.medium)}" target="_blank" rel="noopener">${ICONS.medium}Medium</a>`);
-    if (S.email) out.push(`<a class="btn" href="mailto:${esc(S.email)}">${ICONS.mail}Email</a>`);
     if (S.phone && !primaryFirst) out.push(`<a class="btn" href="tel:${esc(S.phone.replace(/\s+/g, ""))}">${ICONS.phone}${esc(S.phone)}</a>`);
     if (primaryFirst && !S.resume && out.length) out[0] = out[0].replace('class="btn"', 'class="btn primary"');
     return out.join("");
@@ -38,7 +39,8 @@
   $("#footer-name").textContent = S.name || "";
   $("#year").textContent = new Date().getFullYear();
   const initials = (nameParts[0][0] + (nameParts[nameParts.length - 1][0] || "")).toUpperCase();
-  $("#avatar").innerHTML = S.avatar ? `<img src="${esc(S.avatar)}" alt="${esc(S.name)}">` : esc(initials);
+  $("#avatar").innerHTML = S.avatar ? `<img src="${esc(S.avatar)}" alt="Portrait of ${esc(S.name)}" width="168" height="168">` : `<span aria-hidden="true">${esc(initials)}</span>`;
+  if (S.resume) $("#nav-resume").setAttribute("href", S.resume); else $("#nav-resume").remove();
 
   // ---------- Hero contact line ----------
   const hc = [];
@@ -110,11 +112,13 @@
       <article class="card reveal">
         <h3>${esc(p.name)}</h3>
         <p>${esc(p.desc)}</p>
+        ${p.flow ? `<p class="flow">${esc(p.flow)}</p>` : ""}
+        ${p.arch ? `<div class="arch"><b>Architecture</b>${esc(p.arch)}</div>` : ""}
         ${p.tags?.length ? `<ul class="tags">${p.tags.map((t) => `<li class="tag">${esc(t)}</li>`).join("")}</ul>` : ""}
-        <div class="card-links">
+        ${p.repo || p.demo ? `<div class="card-links">
+          ${p.demo ? `<a href="${esc(p.demo)}" target="_blank" rel="noopener">${/medium\.com/.test(p.demo) ? "write-up" : "live demo"} →</a>` : ""}
           ${p.repo ? `<a href="${esc(p.repo)}" target="_blank" rel="noopener">code →</a>` : ""}
-          ${p.demo ? `<a href="${esc(p.demo)}" target="_blank" rel="noopener">read / demo →</a>` : ""}
-        </div>
+        </div>` : ""}
       </article>`)
     .join("");
 
@@ -122,35 +126,42 @@
   const LANG_COLORS = { Python: "#3572A5", JavaScript: "#f1e05a", TypeScript: "#3178c6", HCL: "#844FBA", Shell: "#89e051", Go: "#00ADD8", HTML: "#e34c26", Dockerfile: "#384d54", Java: "#b07219" };
   async function loadRepos() {
     const box = $("#projects-github"), status = $("#gh-status");
-    if (!S.githubUser) { box.closest("section").querySelector(".sub-title").remove(); return; }
-    status.textContent = "loading…";
-    try {
-      const res = await fetch(`https://api.github.com/users/${encodeURIComponent(S.githubUser)}/repos?per_page=100&sort=updated`);
-      if (!res.ok) throw new Error(res.status);
-      const featured = new Set((S.projects || []).map((p) => p.name.toLowerCase()));
-      const exclude = new Set((S.githubExclude || []).map((n) => n.toLowerCase()));
-      const repos = (await res.json())
-        .filter((r) => !(S.githubHideForks && r.fork) && !r.archived && !exclude.has(r.name.toLowerCase()) && !featured.has(r.name.toLowerCase()))
-        .sort((a, b) => b.stargazers_count - a.stargazers_count || new Date(b.pushed_at) - new Date(a.pushed_at))
-        .slice(0, 9);
-      status.textContent = repos.length ? `· ${repos.length} repos` : "";
-      box.innerHTML = repos.length
-        ? repos.map((r) => `
-          <a class="card" href="${esc(r.html_url)}" target="_blank" rel="noopener">
-            <h3>${esc(r.name)}</h3>
-            <p>${esc(r.description || "No description yet.")}</p>
-            <div class="meta">
-              ${r.language ? `<span><i class="lang-dot" style="background:${LANG_COLORS[r.language] || "var(--accent)"}"></i>${esc(r.language)}</span>` : ""}
-              ${r.stargazers_count ? `<span>${ICONS.star} ${r.stargazers_count}</span>` : ""}
-              <span>${new Date(r.pushed_at).toLocaleDateString(undefined, { month: "short", year: "numeric" })}</span>
-            </div>
-          </a>`).join("")
-        : "";
-      if (!repos.length) box.closest("section").querySelector(".sub-title").style.display = "none";
-    } catch (e) {
-      status.textContent = "";
-      box.innerHTML = `<p class="empty">Couldn't load repos right now — <a href="https://github.com/${esc(S.githubUser)}?tab=repositories" style="color:var(--accent)">see them on GitHub →</a></p>`;
+    const sub = box.closest("section").querySelector(".sub-title");
+    const profile = `https://github.com/${encodeURIComponent(S.githubUser || "")}?tab=repositories`;
+    if (!S.githubUser) { sub.remove(); box.remove(); return; }
+    const hide = () => { sub.style.display = "none"; box.innerHTML = ""; };
+    const fallback = () => { status.textContent = ""; box.innerHTML = `<p class="empty">Couldn't reach GitHub just now — <a href="${profile}" target="_blank" rel="noopener" style="color:var(--accent)">browse my repositories on GitHub →</a></p>`; };
+    const KEY = "gh-repos:" + S.githubUser;
+    let data = null;
+    try { const c = JSON.parse(sessionStorage.getItem(KEY) || "null"); if (c && Date.now() - c.t < 36e5) data = c.d; } catch (e) {}
+    if (!data) {
+      const ctrl = new AbortController(); const timer = setTimeout(() => ctrl.abort(), 6000);
+      try {
+        const res = await fetch(`https://api.github.com/users/${encodeURIComponent(S.githubUser)}/repos?per_page=100&sort=updated`, { signal: ctrl.signal });
+        if (!res.ok) throw new Error(res.status);
+        data = (await res.json()).map((r) => ({ name: r.name, html_url: r.html_url, description: r.description, language: r.language, stargazers_count: r.stargazers_count, pushed_at: r.pushed_at, fork: r.fork, archived: r.archived }));
+        try { sessionStorage.setItem(KEY, JSON.stringify({ t: Date.now(), d: data })); } catch (e) {}
+      } catch (e) { clearTimeout(timer); return fallback(); }
+      clearTimeout(timer);
     }
+    const featured = new Set((S.projects || []).map((p) => p.name.toLowerCase()));
+    const exclude = new Set((S.githubExclude || []).map((n) => n.toLowerCase()));
+    const repos = data
+      .filter((r) => !(S.githubHideForks && r.fork) && !r.archived && !exclude.has(r.name.toLowerCase()) && !featured.has(r.name.toLowerCase()))
+      .sort((a, b) => b.stargazers_count - a.stargazers_count || new Date(b.pushed_at) - new Date(a.pushed_at))
+      .slice(0, 9);
+    if (!repos.length) return hide();
+    status.textContent = `· ${repos.length} repos`;
+    box.innerHTML = repos.map((r) => `
+      <a class="card" href="${esc(r.html_url)}" target="_blank" rel="noopener">
+        <h3>${esc(r.name)}</h3>
+        <p>${esc(r.description || "No description yet.")}</p>
+        <div class="meta">
+          ${r.language ? `<span><i class="lang-dot" style="background:${LANG_COLORS[r.language] || "var(--accent)"}"></i>${esc(r.language)}</span>` : ""}
+          ${r.stargazers_count ? `<span>${ICONS.star} ${r.stargazers_count}</span>` : ""}
+          <span>${new Date(r.pushed_at).toLocaleDateString(undefined, { month: "short", year: "numeric" })}</span>
+        </div>
+      </a>`).join("");
   }
   loadRepos();
 
@@ -181,6 +192,27 @@
     })
   );
   renderArticles("all");
+
+  // ---------- Copy email ----------
+  if (S.email) {
+    $("#contact-email").textContent = S.email;
+    $("#contact-email").href = "mailto:" + S.email;
+    const btn = $("#copy-email"), label = btn.querySelector("span"), live = $("#copy-status");
+    btn.addEventListener("click", async () => {
+      let ok = false;
+      try { await navigator.clipboard.writeText(S.email); ok = true; }
+      catch (e) {
+        const r = document.createRange(); r.selectNodeContents($("#contact-email"));
+        const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r);
+        try { ok = document.execCommand("copy"); } catch (_) {}
+        sel.removeAllRanges();
+      }
+      label.textContent = ok ? "Copied ✓" : "Press ⌘/Ctrl+C";
+      live.textContent = ok ? "Email address copied to clipboard" : "";
+      btn.classList.toggle("done", ok);
+      setTimeout(() => { label.textContent = "Copy"; btn.classList.remove("done"); live.textContent = ""; }, 2200);
+    });
+  } else $(".contact-card").remove();
 
   // ---------- Theme toggle ----------
   $("#theme-toggle").addEventListener("click", () => {

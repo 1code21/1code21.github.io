@@ -10,7 +10,7 @@ window.SITE = {
   location: "Bangalore, India",
   email: "ajayexams7@gmail.com",
   phone: "+91 63024 25628",
-  resume: "",          // optional: e.g. "assets/resume.pdf" (remove your phone number first)
+  resume: "assets/Ajay_Dhanyasi_Resume.pdf",
   avatar: "assets/avatar.jpg",
 
   links: {
@@ -19,16 +19,16 @@ window.SITE = {
     medium: "https://medium.com/@ajayexams7",
   },
 
-  // Impact tiles (shown under the hero). kind: "reduction" draws a before→after bar.
+  // Impact tiles — Action + System + Result. kind: "reduction" draws a before→after bar.
   impact: [
-    { value: 1, suffix: "M+", label: "records streamed daily", context: "Real-time CDC with Kafka + Debezium, delivered inside a 10-minute SLA.", where: "Saltmine" },
-    { value: 95, suffix: "%", kind: "reduction", label: "lower reporting latency", context: "Batch reports replaced by near-real-time analytics.", where: "Saltmine" },
-    { value: 85, suffix: "%", kind: "reduction", label: "lower BigQuery query cost", context: "Partitioning + clustering by query pattern — and 65% faster queries.", where: "Castlight Health" },
-    { value: 1, suffix: "TB", label: "files deduplicated", context: "Duplicate-file detection that runs 90% faster on files up to a terabyte.", where: "Castlight Health" },
-    { value: 60, suffix: "%", kind: "reduction", label: "less memory", context: "Legacy Python loops and Pandas rewritten in Polars.", where: "Castlight Health" },
-    { value: 30, suffix: "%", kind: "reduction", label: "lower cloud billing", context: "Lossy Pub/Sub pipeline moved to Airflow on Kubernetes with minimal code changes.", where: "Castlight Health" },
-    { value: 100, suffix: "%", label: "automated stuck-job recovery", context: "Airflow monitor built on XComs + ORM that detects and restarts hung jobs.", where: "Castlight Health" },
-    { value: 4, suffix: "×", label: "GATE qualified", context: "Data Science & AI paper — 2021, 2022, 2024 and 2025.", where: "Achievement" },
+    { value: 1, suffix: "M+", label: "records/day, <10-min SLA", context: "Engineered a Kafka + Debezium CDC pipeline that streams 1M+ records a day into analytics inside a 10-minute SLA.", where: "Saltmine" },
+    { value: 95, suffix: "%", kind: "reduction", label: "lower reporting latency", context: "Replaced batch reporting with the real-time CDC stream, turning next-day reports into near-live analytics.", where: "Saltmine" },
+    { value: 85, suffix: "%", kind: "reduction", label: "lower BigQuery query cost", context: "Re-partitioned and clustered BigQuery tables around real query patterns — queries also ran 65% faster.", where: "Castlight Health" },
+    { value: 1, suffix: "TB", label: "files, 90% faster dedup", context: "Designed duplicate-file detection for inputs up to 1 TB, cutting detection time by 90%.", where: "Castlight Health" },
+    { value: 60, suffix: "%", kind: "reduction", label: "less pipeline memory", context: "Rewrote legacy Python loops and Pandas transforms in Polars, cutting memory use by 60%.", where: "Castlight Health" },
+    { value: 30, suffix: "%", kind: "reduction", label: "lower cloud billing", context: "Migrated a data-losing Pub/Sub pipeline to Airflow on Kubernetes with minimal code changes, cutting resource use by 30%.", where: "Castlight Health" },
+    { value: 20, suffix: "%", kind: "reduction", label: "lower infra cost", context: "Built a pod-metrics sidecar feeding Prometheus + Thanos and Grafana dashboards to right-size Airflow's Kubernetes clusters.", where: "Castlight Health" },
+    { value: 4, suffix: "×", label: "GATE qualified", context: "Qualified the Data Science & AI paper in 2021, 2022, 2024 and 2025.", where: "Achievement" },
   ],
 
   about: [
@@ -125,23 +125,45 @@ window.SITE = {
     { degree: "B.Tech, Electronics & Communication Engineering", school: "Jawaharlal Nehru Technological University", start: "2017", end: "2021" },
   ],
 
-  // Featured projects. GitHub repos are ALSO auto-loaded live below this list.
+  // Featured projects. arch = 2-sentence architecture note; flow = data path.
   projects: [
     {
+      name: "Real-time CDC ingestion platform",
+      desc: "Streams database changes into analytics in near real time — 1M+ records a day inside a 10-minute SLA, cutting reporting latency by 95%.",
+      flow: "Source DB → Debezium → Kafka → PySpark → Warehouse → BI",
+      arch: "Debezium captures row-level changes from the source database and publishes them to Kafka topics. PySpark jobs, tuned with the Catalyst optimizer, transform and load them for real-time dashboards.",
+      tags: ["Kafka", "Debezium", "PySpark", "AWS"],
+    },
+    {
+      name: "Self-healing Airflow on Kubernetes",
+      desc: "Replaced a lossy Pub/Sub pipeline with Airflow on Kubernetes that detects and recovers its own stuck jobs — 30% lower billing.",
+      flow: "Scheduler → K8s pods → sidecar metrics → Prometheus/Thanos → Grafana",
+      arch: "A monitor built on XComs and the Airflow ORM finds hung tasks and terminates or retries them automatically. A sidecar in each pod exports requested vs. used CPU/memory to Prometheus and Thanos, visualised in Grafana to right-size resources.",
+      tags: ["Airflow", "Kubernetes", "Prometheus", "Grafana"],
+      demo: "https://medium.com/@ajayexams7/building-a-self-reliant-self-healing-apache-airflow-never-lose-a-pipeline-again-89657d1510ed",
+    },
+    {
+      name: "ML-driven adaptive batch sizing",
+      desc: "Swapped static ETL batches for batch sizes predicted by a BigQuery ML model, so small loads stop wasting resources and big loads stop bottlenecking.",
+      flow: "Raw → Stage → Golden · BigQuery ML picks the batch tier",
+      arch: "A logistic-regression model in BigQuery ML classifies each incoming load into small, standard or heavy tiers from volume and past runtime metrics. The orchestrator then sets parallelism for that tier across the Medallion layers.",
+      tags: ["BigQuery ML", "Medallion", "ETL"],
+      demo: "https://medium.com/@ajayexams7/ml-driven-adaptive-batch-sizing-in-medallion-architecture-0ba03f90f5b8",
+    },
+    {
       name: "terraform-drift",
-      desc: "Detects drift between Terraform state and live cloud infrastructure. Taken from MVP to production-grade with CI/CD, docs and a security policy.",
-      tags: ["Python", "Terraform", "IaC"],
+      desc: "Open-source Python tool that detects drift between Terraform state and live cloud infrastructure, taken from MVP to production-grade.",
+      flow: "Terraform state ↔ cloud APIs → drift report → CI",
+      arch: "Compares resources in Terraform state against what actually exists in the cloud provider and reports differences. Ships with CI/CD, documentation and a security policy.",
+      tags: ["Python", "Terraform", "IaC", "Open Source"],
       repo: "https://github.com/1code21",   // TODO: exact repo URL
       demo: "https://medium.com/@ajayexams7/elevating-terraform-drift-from-mvp-to-production-grade-47b712565a58",
     },
     {
-      name: "Real-time CDC pipeline",
-      desc: "Kafka + Debezium change-data-capture platform streaming 1M+ records a day into analytics with a sub-10-minute SLA.",
-      tags: ["Kafka", "Debezium", "CDC"],
-    },
-    {
       name: "AI GitHub issue triage (n8n)",
-      desc: "An AI workflow that fetches, analyses, categorises and routes GitHub issues automatically.",
+      desc: "An AI workflow that fetches, analyses, categorises and routes GitHub issues across repositories automatically.",
+      flow: "GitHub API → n8n → LLM classify → label & route",
+      arch: "n8n pulls new issues from the GitHub API and sends them to an LLM for classification and summarisation. Results are written back as labels and routed to the right owners.",
       tags: ["n8n", "LLM", "Automation"],
       demo: "https://medium.com/@ajayexams7/designing-an-ai-workflow-in-n8n-for-github-issue-management-ef135d35f9c5",
     },

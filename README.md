@@ -1,24 +1,31 @@
 # 1code21.github.io
 
-Personal portfolio of Ajay Dhanyasi — live at **https://1code21.github.io**
+Portfolio of Ajay Babu Dhanyasi — Senior Data Platform Engineer. Live at **https://1code21.github.io**
 
 Plain HTML/CSS/JS, no build step. GitHub Pages serves it straight from `main`.
 
 ## Updating content
 
-All content lives in **`data.js`** — skills, experience, featured projects and articles.
-Edit, commit, push; the site updates in ~1 minute.
+Everything lives in **`data.js`**:
 
-- **Articles:** add an object to `articles` with `source: "medium"` or `"linkedin"`.
-- **GitHub repos:** loaded live from the GitHub API (`githubUser`). Forks and anything in `githubExclude` are hidden.
-- **Photo / résumé:** drop files in `assets/` and set `avatar` / `resume` in `data.js`.
+| Key | What it drives |
+|---|---|
+| `impact` | Impact tiles under the hero (Action + System + Result). `kind: "reduction"` adds a before→after bar |
+| `experience` | Timeline |
+| `projects` | Featured cards — `flow` (data path), `arch` (2-sentence architecture), `demo`, `repo` |
+| `articles` | Writing list — `source: "medium"` or `"linkedin"` |
+| `resume` | Path to the PDF used by every résumé button |
 
-## Theme
+Replace the résumé by overwriting `assets/Ajay_Dhanyasi_Resume.pdf` (keep the name).
 
-Colors are CSS variables at the top of `assets/style.css` (light + dark). Change `--accent` to re-skin.
+## SEO / social
+
+- Social preview image: `og-image.jpg` (1200×630). Meta tags are in `index.html`.
+- `favicon.svg`, `apple-touch-icon.png`, `robots.txt`, `sitemap.xml`, and JSON-LD Person data.
+- After deploying, refresh LinkedIn's cached preview at https://www.linkedin.com/post-inspector/
 
 ## Local preview
 
 ```bash
-python3 -m http.server 8000   # then open http://localhost:8000
+python3 -m http.server 8000   # open http://localhost:8000
 ```

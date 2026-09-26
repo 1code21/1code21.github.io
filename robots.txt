@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://1code21.github.io/sitemap.xml
