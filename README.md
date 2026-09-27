@@ -4,6 +4,10 @@ Portfolio of Ajay Babu Dhanyasi — Senior Data Platform Engineer. Live at **htt
 
 Plain HTML/CSS/JS, no build step. GitHub Pages serves it straight from `main`.
 
+**Theme:** streaming-style (dark, red accent) — "Who's viewing?" profile picker, billboard hero,
+Top-8 wins row, experience as Seasons → Episodes, poster rows for projects/articles, detail pop-ups.
+Fonts (Bebas Neue, Inter — SIL OFL) are self-hosted in `assets/fonts/`. The previous minimal theme is in git history.
+
 ## Updating content
 
 Everything lives in **`data.js`**:
